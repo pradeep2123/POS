@@ -2,6 +2,7 @@ const express = require('express');
 const mongodb = require('mongodb');
 const _ = require('underscore')
 const Product = require('../models').Product
+const Data = require('../config').data
 
 const createProduct = function(req,res){
     var product = req.body.product;
@@ -115,8 +116,8 @@ const placeOrder = function(req,res){
             return acc + val;
         },0);
 
-        var sales_tax = sum_price_for_tax * 10/100;
-        var imported_duty = (sum_price_for_tax - sum_price_for_non_import) *( 5/100)
+        var sales_tax = sum_price_for_tax * Data.sales_tax
+        var imported_duty = (sum_price_for_tax - sum_price_for_non_import) * Data.import_tax
         
         var totalBill = sum_price_for_tax + sales_tax + imported_duty;
         
