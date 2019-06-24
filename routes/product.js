@@ -4,7 +4,15 @@ const _ = require('underscore')
 const Product = require('../models').Product
 const Data = require('../config').data
 
-// USer  have to create a product 
+// User  have to create a product , if same product u entered ,it updates. this API only for me to add items in mongodb.
+// {
+	// "product":{
+	// 	"item":"musics",
+	// 	"price":30,
+	// 	"isImported":"true"
+	// }
+    //}	 
+//
 const createProduct = function(req,res){
     var product = req.body.product;
 
@@ -54,6 +62,37 @@ const createProduct = function(req,res){
         }
     })
 }
+ // *** For "Show PRODUCTS" ***//
+
+// we should be able to enter product, quantity of the product. The
+//system should show the price for each product and total price at the bottom.
+
+//input
+/******** USER INPUT ******** */
+// {
+// 	"order":[
+// 		{
+// 		"item":"books",
+// 		"quantity":2
+// 		},
+// 		{
+// 		"item":"music",
+// 		"quantity":2
+// 		}
+	
+// 	]
+	
+// }
+
+//  OUTPUT //
+// {
+//     "type": "success",
+//     "items": {
+//         "books": 40,
+//         "music": 30
+//     },
+//     "totalPrice": 140
+// }
 
 const showProducts = (req,res)=>{
     var order = req.body.order;
@@ -100,7 +139,29 @@ const showProducts = (req,res)=>{
 
 }
 
-
+// For PlaceOrder //
+// INPUT //
+//  {
+	// "order":[
+	// 	{
+	// 	"item":"books",
+	// 	"quantity":2
+	// 	},
+	// 	{
+	// 		"item":"music",
+	// 		"quantity":3
+	// 	}
+	
+    // ]
+    //}
+//
+// OUTPUT //
+// {
+    // "totalSalesTax": 17,
+    // "totalImportDuty": 4.5,
+    // "totalBill": 191.5
+    //} 
+//
 const placeOrder = function(req,res){
     var order = req.body.order;
   
