@@ -4,6 +4,7 @@ const _ = require('underscore')
 const Product = require('../models').Product
 const Data = require('../config').data
 
+// USer  have to create a product 
 const createProduct = function(req,res){
     var product = req.body.product;
 
@@ -12,7 +13,6 @@ const createProduct = function(req,res){
             product.isImported = false
         }
         if(items){
-            console.dir(items)
             if(items.item == 'books'){
                 items.isImported = false
             }
@@ -55,22 +55,51 @@ const createProduct = function(req,res){
     })
 }
 
-const listAllProduct = function(req,res,data){
-    console.log("fkjvbbbbbbbbdfk")
-    Product.find({})
-    .then(function(success){
-       return res.json({
-           type:"Success",
-           data:success
-       });
+const showProducts = (req,res)=>{
+    var order = req.body.order;
+
+    var itemsFromOrder = {};
+    for(var i= 0; i<order.length;i++){
+        itemsFromOrder[order[i].item] = order[i].quantity
+    }  
+    var items = Object.keys(itemsFromOrder)
+    Product.find({
+      item:{
+          $in:items
+      }  
+    })
+    .then(function(ordered_items){
+        var itemsWithPrice = {};
+        for(var i= 0; i<ordered_items.length;i++){
+            itemsWithPrice[ordered_items[i].item] = ordered_items[i].price
+        }   
+        var Price =[];
+        var itemsPrice = ordered_items.map((p)=>{
+            p.price = p.price * itemsFromOrder[p.item];
+            Price.push(p.price)
+            return  p ? p.price : 0;
+        });
+        itemsPrice = _.without(itemsPrice,undefined,null)
+        var totalPrice = itemsPrice.reduce((acc,val)=>{
+            return acc+val
+        },0)
+            
+        return  res.send({
+            type:"success",
+            items:itemsWithPrice,
+            totalPrice:totalPrice
+        })
     })
     .catch(function(error){
-       return res.json({
-           type:"Error",
-           data:error
-       })
+        return res.send({
+            type:"error",
+            message:"No Products has to display",
+            data:error
+        })
     })
+
 }
+
 
 const placeOrder = function(req,res){
     var order = req.body.order;
@@ -86,7 +115,6 @@ const placeOrder = function(req,res){
     for(var i= 0; i<order.length;i++){
         itemByQuantity[order[i].item] = order[i].quantity
     }
-    console.log(itemByQuantity,"items")
     var items = Object.keys(itemByQuantity);
     items = _.union(items);
   
@@ -100,7 +128,6 @@ const placeOrder = function(req,res){
         var item_with_tax = founded_items.map((p)=>{
             p.price = p.price * itemByQuantity[p.item];
             if(p.isImported == false){
-                console.log(p.price,p.item)
                 items_without_import.push(p.price)
             }
               return  p ? p.price : 0;
@@ -139,5 +166,5 @@ const placeOrder = function(req,res){
 module.exports = {
     createProduct:createProduct,
     placeOrder:placeOrder,
-    listAllProduct:listAllProduct
+    showProducts:showProducts
 }
