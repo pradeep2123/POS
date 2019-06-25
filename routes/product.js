@@ -24,7 +24,7 @@ const createProduct = function(req,res){
             if(items.item == 'books'){
                 items.isImported = false
             }
-            Product.updateMany({item:product.item},{item:product.item,price:product.price,isImported:product.isImported},{upsert:false})
+            Product.updateOne({item:product.item},{item:product.item,price:product.price,isImported:product.isImported},{upsert:false})
             .then(function(updated){
                 return res.send({
                     type:"Success",
