@@ -13,10 +13,10 @@ const Data = require('../config').data
 	// }
     //}	 
 //
-const createProduct = function(req,res){
+const createProduct = (req,res)=>{
     var product = req.body.product;
 
-    Product.findOne({item:product.item},function(error,items){
+    Product.findOne({item:product.item},(error,items)=>{
         if(product.item == 'books'){
             product.isImported = false
         }
@@ -25,14 +25,14 @@ const createProduct = function(req,res){
                 items.isImported = false
             }
             Product.updateMany({item:product.item},{item:product.item,price:product.price,isImported:product.isImported},{upsert:false})
-            .then(function(updated){
+            .then((updated)=>{
                 return res.send({
                     type:"Success",
                     message:"Successfully updated",
                     data:updated
                 })
             })
-            .catch(function(error){
+            .catch((error)=>{
                 return res.send({
                     type:"Error",
                     message:"Items not updated",
@@ -45,14 +45,14 @@ const createProduct = function(req,res){
                 price:product.price,
                 isImported:product.isImported
             })
-            .then(function(inserted){
+            .then((inserted)=>{
                return res.send({
                     type:"Success",
                     message:"Successfully created",
                     data:inserted
                 })
             })
-            .catch(function(error){
+            .catch((error)=>{
                 return res.send({
                     type:"Error",
                     message:"Items not added",
@@ -102,12 +102,13 @@ const showProducts = (req,res)=>{
         itemsFromOrder[order[i].item] = order[i].quantity
     }  
     var items = Object.keys(itemsFromOrder)
+    items = _.union(items);
     Product.find({
       item:{
           $in:items
       }  
     })
-    .then(function(ordered_items){
+    .then((ordered_items)=>{
         var itemsWithPrice = {};
         for(var i= 0; i<ordered_items.length;i++){
             itemsWithPrice[ordered_items[i].item] = ordered_items[i].price
@@ -125,11 +126,11 @@ const showProducts = (req,res)=>{
             
         return  res.send({
             type:"success",
-            items:itemsWithPrice,
+            itemsWithPrice:itemsWithPrice,
             totalPrice:totalPrice
         })
     })
-    .catch(function(error){
+    .catch((error)=>{
         return res.send({
             type:"error",
             message:"No Products has to display",
@@ -162,7 +163,7 @@ const showProducts = (req,res)=>{
     // "totalBill": 191.5
     //} 
 //
-const placeOrder = function(req,res){
+const placeOrder = (req,res)=>{
     var order = req.body.order;
   
     // var order_map =  order.map((obj,key)=>{
@@ -184,7 +185,7 @@ const placeOrder = function(req,res){
           $in:items
       }  
     })
-    .then(function(founded_items){
+    .then((founded_items)=>{
         var items_without_import = []
         var item_with_tax = founded_items.map((p)=>{
             p.price = p.price * itemByQuantity[p.item];
@@ -215,7 +216,7 @@ const placeOrder = function(req,res){
             totalBill:totalBill   
         })
     })
-    .catch(function(error){
+    .catch((error)=>{
         return res.send({
             type:"Error",
             message:"No Data's Found",
